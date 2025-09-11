@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"  // change to "postgresql" for Postgres
+  url      = env("DATABASE_URL")
+}
+
+model Profile {
+  id       String   @id @default(cuid())
+  version  Int
+  updated  DateTime
+  seasons  Season[]
+}
+
+model Season {
+  id          String       @id @default(cuid())
+  year        Int
+  profileId   String
+  profile     Profile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  tabulations Tabulation[]
+  tournaments Tournament[]
+  @@unique([profileId, year])
+}
+
+model Tabulation {
+  id        String  @id @default(cuid())
+  label     String
+  events    Int
+  first     Int?
+  second    Int?
+  third     Int?
+  top10     Int?
+  top25     Int?
+  cutsMade  Int?
+  points    Float?
+  standing  String?
+  seasonId  String
+  season    Season @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+}
+
+model Tournament {
+  id         String  @id @default(cuid())
+  date       DateTime?
+  dateStart  DateTime?
+  dateEnd    DateTime?
+  tournament String
+  course     String
+  score      String
+  place      Int?
+  points     Float?
+  seasonId   String
+  season     Season @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+}
